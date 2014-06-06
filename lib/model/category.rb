@@ -1,8 +1,10 @@
-class Category < ActiveRecord::Base
+module BBS
+  class Category < ActiveRecord::Base
 
-  attr_accessor :name, :description
+    attr_accessor :name, :description
 
-  def initialize(args)
+    def initialize(args)
 
+    end
   end
 end

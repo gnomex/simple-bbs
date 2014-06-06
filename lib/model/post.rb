@@ -1,8 +1,10 @@
-class Post < ActiveRecord::Base
+module BBS
+  class Post < ActiveRecord::Base
 
-  attr_accessor :owner, :title, :body, :created_at
+    attr_accessor :owner, :title, :body, :created_at
 
-  def initialize(args = {})
+    def initialize(args = {})
 
+    end
   end
 end

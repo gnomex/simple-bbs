@@ -1,18 +1,20 @@
-class User < ActiveRecord::Base
+module BBS
+  class User < ActiveRecord::Base
 
-  attr_accessor :name
+    attr_accessor :name
 
-  def initialize(args = {})
+    def initialize(args = {})
 
-  end
+    end
 
-  def admin?
-    check_admin
-  end
+    def admin?
+      check_admin
+    end
 
-  private
+    private
 
-  def check_admin
-    false
+    def check_admin
+      false
+    end
   end
 end
