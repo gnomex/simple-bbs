@@ -4,6 +4,7 @@ require 'eventmachine'
 require 'yaml'
 
 require './bbs/echo_server'
+require './bbs/simple_chat_server'
 #Models
 require './model/user'
 require './model/category'
@@ -23,6 +24,16 @@ module BBS
       Signal.trap("TERM") { EventMachine.stop }
 
       EventMachine.start_server("localhost", 10000, EchoServer)
+    end
+  end
+
+  def BBS.simple_chat_server
+    EventMachine.run do
+      # hit Control + C to stop
+      Signal.trap("INT")  { EventMachine.stop }
+      Signal.trap("TERM") { EventMachine.stop }
+
+      EventMachine.start_server("localhost", 10000, SimpleChatServer)
     end
   end
 end
