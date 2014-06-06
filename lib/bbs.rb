@@ -4,6 +4,10 @@ require 'eventmachine'
 require 'yaml'
 
 require './bbs/echo_server'
+#Models
+require './model/user'
+require './model/category'
+require './model/post'
 
 dbconfig = YAML::load(File.open('db/database.yml'))
 ActiveRecord::Base.establish_connection(dbconfig)
