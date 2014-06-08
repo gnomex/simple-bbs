@@ -11,12 +11,13 @@
 * All data will be pure String, to make TCP traffic analysis
 
 # Messaging API
-    All data is a JSON
+    All data is a JSON-like, raw data is pure strings
 
-The structure of the JSON are
+The structure of the JSON is:
 
 * An action
 * The action data params
+* Close
 
 ## Actions
 
@@ -54,6 +55,7 @@ The structure of the JSON are
 # Owner an category are opcional
 {
   action: 'show',
+  what: '[posts|users|categories]',
   data: {
     owner: "",
     category: ""
@@ -61,6 +63,21 @@ The structure of the JSON are
 }
 ```
 
+* Ends the connection
+
+```ruby
+{
+  action: 'marmota'
+}
+```
+
+## Basic flow
+
+1. Establish the TCP connection
+2. Server will ask the username
+3. Client tells its name
+4. Client/Server interacts with actions
+5. Close the connection when `marmota` is received
 
 ## Go!
 
