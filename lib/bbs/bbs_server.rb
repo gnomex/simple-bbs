@@ -1,6 +1,5 @@
 module BBS
   class BBSServer < EM::Connection
-    attr_accessor :connected_clients
     attr_reader :user
 
     # Must be need a class variable!
@@ -15,18 +14,18 @@ module BBS
     end
 
     def unbind
-      puts "TCP connection closed successfully. Come back soon #{@user.username}"
-      @connected_clients.delete(self)
+      notify "TCP connection closed successfully. Come back soon"
+      @@connected_clients.delete(@user)
     end
 
     def receive_data(data)
       # remove white spaces and downcase
-      data = data.strip.downcase
+      data = data.downcase
 
       if active_user?
-        handle_raw_data(JSON.parse(data))
+        handle_raw_data(data)
       else
-        handle_username(data)
+        handle_username(data.strip)
       end
     end
 
@@ -42,96 +41,91 @@ module BBS
         send_line("Blank usernames are not allowed. Try again.")
         ask_username
       else
-        username = input
+        @user = UsersController.new.check_user(input)
 
-        @user = UsersController.new.check_user(username)
-
-        self.send_line("-> Welcome #{@user.username}")
-      end
-    end # handle_username(input)
-
-    def ask_username
-      self.send_line("[info] Enter your username:")
-    end # ask_username
-
-    #
-    # Actions handling
-    #
-
-    def handle_actions(action)
-      case action['action']
-      when "create"
-      when "show"
-      when "delete"
-      when "marmota"
-      end
-    end
-
-    def handle_raw_data(msg)
-      if command?(msg)
-        self.handle_command(msg)
-      else
-        if direct_message?(msg)
-          self.handle_direct_message(msg)
+        unless other_peers
+          @@connected_clients.push(@user)
+          send_line("-> Welcome #{@user.username}")
         else
-          self.announce(msg, "#{@username}:")
+          puts " #{@user.username} have two connections, kill one!"
+          send_line("-> You stay logged from another ip")
+          handle_close
         end
       end
     end
 
-    def handle_direct_message(input)
-      username, message = parse_direct_message(input)
-
-      if connection = @connected_clients.find { |c| c.username == username }
-        puts "[dm] @#{@username} => @#{username}"
-        connection.send_line("[dm] @#{@username}: #{message}")
-      else
-        send_line "@#{username} is not in the room. Here's who is: #{usernames.join(', ')}"
-      end
-    end # handle_direct_message(input)
-
-    def parse_direct_message(input)
-      return [$1, $2] if input =~ DM_REGEXP
-    end # parse_direct_message(input)
-
+    def ask_username
+      self.send_line("--  Enter your username:")
+    end
 
     #
-    # Commands handling
+    # Actions handling
     #
-
-    def command?(input)
-      input =~ /(exit|status)$/i
-    end # command?(input)
-
-    def handle_command(cmd)
-      case cmd
-      when /exit$/i   then self.close_connection
-      when /status$/i then self.send_line("[chat server] It's #{Time.now.strftime('%H:%M')} and there are #{self.number_of_connected_clients} people in the room")
+    def handle_actions(hash)
+      case hash['action']
+      when "create" then handle_create(hash["data"])
+      when "show" then handle_show(hash["data"])
+      when "delete" then handle_delete(hash["data"])
+      when "marmota" then handle_close
+      else self.send_line "What? I cannot understand you, bro!"
       end
-    end # handle_command(cmd)
+    end
 
+    # Receive a String and convert to a hash
+    def handle_raw_data(data)
+      begin
+        data_hash = JSON.parse(data)
+        handle_actions(data_hash)
+      rescue Exception => error
+        send_line "What? I cannot understand you, bro!"
+        puts "Error #{error.message}"
+      end
+    end
 
     #
     # Helpers
     #
-    def announce(msg = nil, prefix = "[chat server]")
-      @connected_clients.each { |c| c.send_line("#{prefix} #{msg}") } unless msg.empty?
+    def status
+      notify "It's #{Time.now}, and there are #{@@connected_clients.length} marmots"
     end # announce(msg)
 
+    def notify(msg = nil, prefix = "[BBS server]")
+      send_line("#{prefix} #{msg}")
+    end
+
+    def broadcast_notify(msg = nil, prefix = "[BBS server]")
+      @@connected_clients.each { send_line("#{prefix} #{msg}") } unless msg.empty?
+    end
+
     def number_of_connected_clients
-      @connected_clients.size
+      @@connected_clients.size
     end # number_of_connected_clients
 
     def other_peers
-      @connected_clients.reject { |c| self == c }
-    end # other_peers
+      @@connected_clients.include?(@user)
+    end
 
     def send_line(line)
       self.send_data("#{line}\n")
-    end # send_line(line)
+    end
 
-    def usernames
-      @connected_clients.map { |c| c.username }
-    end # usernames
+    private
+    def handle_create(data_hash)
+
+    end
+
+    def handle_show(data_hash)
+
+    end
+
+    def handle_delete(data_hash)
+
+    end
+
+    def handle_close
+      send_line "Closing the server. Come back later #{@user.username}"
+      puts " #{@user.username} has left."
+      self.close_connection
+    end
   end
 end

@@ -71,6 +71,11 @@ The structure of the JSON is:
 }
 ```
 
+## Using TELNET
+    String line commands
+
+* `{"action": "marmota"}`
+
 ## Basic flow
 
 1. Establish the TCP connection
