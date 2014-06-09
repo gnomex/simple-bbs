@@ -1,11 +1,20 @@
 module BBS
   class UsersController
-    def initialize(args = {})
-      @user = User.new
+
+    def have_name?
+      @user.username?
     end
 
-    def create
+    def check_user(username)
+      @user = User.find_by(name: username)
 
+      unless @user.nil?
+        @user
+      else
+        @user = User.new(name: username)
+
+        @user if @user.save
+      end
     end
 
     def make_admin!
@@ -14,8 +23,5 @@ module BBS
       @user.update
     end
 
-    def delete
-      User.find(:id).destroy
-    end
   end
 end

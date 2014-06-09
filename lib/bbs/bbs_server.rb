@@ -1,55 +1,52 @@
 module BBS
-  class SimpleChatServer < EM::Connection
+  class BBSServer < EM::Connection
+    attr_accessor :connected_clients
+    attr_reader :user
 
+    # Must be need a class variable!
     @@connected_clients = Array.new
-    DM_REGEXP           = /^@([a-zA-Z0-9]+)\s*:?\s*(.+)/.freeze
-
-    attr_reader :username
 
     #
     # EventMachine handlers
     #
-
     def post_init
-      @username = nil
-
-      puts "A client has connected..."
+      puts "TCP connection attempt completed successfully and a new client has connected."
       ask_username
     end
 
     def unbind
-      send_line "Come back soon #{username}"
-      @@connected_clients.delete(self)
-      puts "[info] #{@username} has left" if entered_username?
+      puts "TCP connection closed successfully. Come back soon #{@user.username}"
+      @connected_clients.delete(self)
     end
 
     def receive_data(data)
-      if entered_username?
-        handle_chat_message(data.strip)
+      # remove white spaces and downcase
+      data = data.strip.downcase
+
+      if active_user?
+        handle_raw_data(JSON.parse(data))
       else
-        handle_username(data.strip)
+        handle_username(data)
       end
     end
 
     #
     # Username handling
     #
-
-    def entered_username?
-      !@username.nil? && !@username.empty?
-    end # entered_username?
+    def active_user?
+      !@user.nil?
+    end
 
     def handle_username(input)
       if input.empty?
         send_line("Blank usernames are not allowed. Try again.")
         ask_username
       else
-        @username = input
-        @@connected_clients.push(self)
-        self.other_peers.each { |c| c.send_data("#{@username} has joined the room\n") }
-        puts "#{@username} has joined"
+        username = input
 
-        self.send_line("[info] Ohai, #{@username}")
+        @user = UsersController.new.check_user(username)
+
+        self.send_line("-> Welcome #{@user.username}")
       end
     end # handle_username(input)
 
@@ -57,12 +54,20 @@ module BBS
       self.send_line("[info] Enter your username:")
     end # ask_username
 
-
     #
-    # Message handling
+    # Actions handling
     #
 
-    def handle_chat_message(msg)
+    def handle_actions(action)
+      case action['action']
+      when "create"
+      when "show"
+      when "delete"
+      when "marmota"
+      end
+    end
+
+    def handle_raw_data(msg)
       if command?(msg)
         self.handle_command(msg)
       else
@@ -72,16 +77,12 @@ module BBS
           self.announce(msg, "#{@username}:")
         end
       end
-    end # handle_chat_message(msg)
-
-    def direct_message?(input)
-      input =~ DM_REGEXP
-    end # direct_message?(input)
+    end
 
     def handle_direct_message(input)
       username, message = parse_direct_message(input)
 
-      if connection = @@connected_clients.find { |c| c.username == username }
+      if connection = @connected_clients.find { |c| c.username == username }
         puts "[dm] @#{@username} => @#{username}"
         connection.send_line("[dm] @#{@username}: #{message}")
       else
@@ -113,17 +114,16 @@ module BBS
     #
     # Helpers
     #
-
     def announce(msg = nil, prefix = "[chat server]")
-      @@connected_clients.each { |c| c.send_line("#{prefix} #{msg}") } unless msg.empty?
+      @connected_clients.each { |c| c.send_line("#{prefix} #{msg}") } unless msg.empty?
     end # announce(msg)
 
     def number_of_connected_clients
-      @@connected_clients.size
+      @connected_clients.size
     end # number_of_connected_clients
 
     def other_peers
-      @@connected_clients.reject { |c| self == c }
+      @connected_clients.reject { |c| self == c }
     end # other_peers
 
     def send_line(line)
@@ -131,7 +131,7 @@ module BBS
     end # send_line(line)
 
     def usernames
-      @@connected_clients.map { |c| c.username }
+      @connected_clients.map { |c| c.username }
     end # usernames
   end
 end

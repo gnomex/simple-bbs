@@ -2,11 +2,10 @@ module BBS
   class User < ActiveRecord::Base
     has_many :posts
 
-    before_create :set_default_role
+    after_initialize :set_default_role
 
-    def initialize
-      self.admin = false
-    end
+    validates :name, presence: true
+    validates :admin, inclusion: { in: [true, false] }
 
     def admin?
       check_admin
@@ -20,6 +19,10 @@ module BBS
       ["@", self.name].join()
     end
 
+    def username?
+      !self.name.empty?
+    end
+
     private
     def check_admin
       self.admin
@@ -31,7 +34,6 @@ module BBS
 
     def set_default_role
       self.admin = false
-      nil
     end
   end
 end
