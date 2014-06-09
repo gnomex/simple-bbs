@@ -67,6 +67,7 @@ module BBS
       when "show" then handle_show(hash["data"])
       when "delete" then handle_delete(hash["data"])
       when "marmota" then handle_close
+      when "status" then status
       else self.send_line "What? I cannot understand you, bro!"
       end
     end

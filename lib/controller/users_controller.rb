@@ -1,6 +1,5 @@
 module BBS
   class UsersController
-
     def have_name?
       @user.username?
     end
