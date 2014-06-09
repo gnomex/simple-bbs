@@ -63,6 +63,14 @@ The structure of the JSON is:
 }
 ```
 
+* Status of server
+
+```ruby
+{
+  action: 'status'
+}
+```
+
 * Ends the connection
 
 ```ruby
