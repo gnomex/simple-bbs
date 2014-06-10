@@ -25,6 +25,10 @@ module BBS
       end
     end
 
+    def posts
+      @posts = Post.all
+    end
+
     def search(user = nil, category = nil)
       @posts = Post.all
 
