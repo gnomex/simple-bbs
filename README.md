@@ -55,9 +55,8 @@ The structure of the JSON is:
 # Owner an category are opcional
 {
   action: 'show',
-  what: '[posts|users|categories]',
   data: {
-    owner: "",
+    user: "",
     category: ""
   }
 }
@@ -83,6 +82,7 @@ The structure of the JSON is:
     String line commands
 
 * `{"action": "marmota"}`
+* `{"action": "show", "data": { "category": "Marmotagem"}}`
 
 ## Basic flow
 

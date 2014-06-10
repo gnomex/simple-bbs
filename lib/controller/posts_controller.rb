@@ -30,6 +30,7 @@ module BBS
     end
 
     def search(user = nil, category = nil)
+
       @posts = Post.all
 
       unless category.nil?
@@ -40,7 +41,7 @@ module BBS
         @posts = @posts.by_owner(user)
       end
 
-      @posts.order
+      @posts
     end
 
     private

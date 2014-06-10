@@ -113,14 +113,31 @@ module BBS
     private
     def handle_create(data_hash)
 
+      data_hash.store("user_id", @user.id)
+      @post = PostsController.create(data_hash)
+
+      unless @post.nil?
+        send_line "successfully created, see: #{@post.to_json}"
+      end
+
     end
 
     def handle_show(data_hash)
+      begin
+        @post = PostsController.new.search(data_hash['user'], data_hash['category'])
 
+        if @post.nil?
+          send_line "Nothing found."
+        else
+          send_line "#{@post.to_json}"
+        end
+      rescue Exception => e
+        puts "An error has ocurred. See: #{e.message}"
+      end
     end
 
     def handle_delete(data_hash)
-
+      PostsController.new.delete(data_hash['post_id'], @user)
     end
 
     def handle_close

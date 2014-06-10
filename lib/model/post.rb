@@ -13,12 +13,12 @@ module BBS
 
     # Named Scopes
     class << self
-      def by_category(category)
-        joins(:category).find_by(name: category.name)
+      def by_category(category_name)
+        joins(:category).where(categories: { name: category_name })
       end
 
-      def by_owner(user)
-        joins(:user).find_by(name: user.name)
+      def by_owner(user_name)
+        joins(:user).where(users: { name: user_name })
       end
     end
   end

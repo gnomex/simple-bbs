@@ -17,7 +17,7 @@ module BBS
     end
 
     def categories
-      @categories = Category.all
+      @categories = Category.all.order
     end
 
     def delete(category)
