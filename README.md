@@ -137,7 +137,11 @@ The structure of the JSON is:
 1. Clone the source
 2. go to project path (`cd ~path~/simple-bbs/`)
 3. run de blundler (`bundle install`)
-4. (In progress...)
+4. Edit the db configs (`db\database.yml`)
+5. Create your db
+6. Run the migrations (`rake migrate`)
+7. Run the server
+8. Have fun
 
 ## Contributing
 
