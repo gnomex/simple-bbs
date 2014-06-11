@@ -53,8 +53,17 @@ The structure of the JSON is:
 # Delete requires a data with a post id to delete
 {
   action: 'delete',
+  what: 'post',
   data: {
     post_id: '1'
+  }
+}
+
+{
+  action: 'delete',
+  what: 'category',
+  data: {
+    category: 'Marmotas'
   }
 }
 ```
@@ -109,8 +118,11 @@ The structure of the JSON is:
 * `{"action": "show", "what": "users" }`
 * `{"action": "show", "what": "categories" }`
 * `{"action": "show", "what": "posts","data": { "category": "marmotagem"}}`
-* `{"action": "create", "data": { "title": "Something", "body": "Mussum ipsum cacilds, vidis litro abertis.", "category": "lol" }}`
+* `{"action": "show", "what": "posts","data": {}}`
+* `{"action": "create", "what": "post", "data": { "title": "Something", "body": "Mussum ipsum cacilds, vidis litro abertis.", "category": "marmotas" }}`
 * `{"action": "create", "what": "category", "data": { "name": "Marmotas" }}`
+* `{"action": "delete", "what": "category", "data": { "category": "Marmotas" }}`
+* `{"action": "delete", "what": "post", "data": { "post_id": 1 }}`
 
 ## Basic flow
 
