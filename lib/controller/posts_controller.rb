@@ -20,7 +20,7 @@ module BBS
     end
 
     def delete(post_id, user)
-      @post = Post.find_by(post_id: post_id)
+      @post = Post.find_by(id: post_id)
 
       unless @post.nil?
         if @post.is_owner?(user) or user.admin?
