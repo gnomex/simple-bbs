@@ -16,6 +16,14 @@ module BBS
       end
     end
 
+    def all_users(user)
+      if user.admin?
+        User.all
+      else
+        "You do not have permission"
+      end
+    end
+
     def make_admin!
       @user = User.find(:id)
       @user.make_admin!

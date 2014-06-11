@@ -1,9 +1,18 @@
 module BBS
  class PostsController
 
-    def create(args = {})
-      if validate_params(args)
-        @post = Post.new(args)
+    def create(hash, user)
+      if validate_params(hash)
+
+        category = CategoriesController.new.create(hash["category"])
+        hash.delete("category")
+
+        puts hash.inspect
+
+        @post = Post.new(hash)
+        @post.category = category
+        @post.user = user
+
         @post if @post.save
       else
         nil
@@ -30,7 +39,6 @@ module BBS
     end
 
     def search(user = nil, category = nil)
-
       @posts = Post.all
 
       unless category.nil?
@@ -46,7 +54,7 @@ module BBS
 
     private
     def validate_params(hash)
-      hash.include?('title') and hash.include?('body') and hash.include?('category') and hash.include?('user_id')
+      hash.include?('title') and hash.include?('body') and hash.include?('category')
     end
   end
 end

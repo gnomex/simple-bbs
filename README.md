@@ -26,12 +26,23 @@ The structure of the JSON is:
 ```ruby
 # Create requires a data with a new post
 # The owner will be the current user name
+# Category w'll be created by default if not exists
 {
   action: 'create',
+  what: 'post',
   data: {
     title: "Something",
     body: "Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois divoltis porris, paradis. Paisis, filhis, espiritis santis. Mé faiz elementum girarzis, nisi eros vermeio, in elementis mé pra quem é amistosis quis leo. Manduma pindureta quium dia nois paga. Sapien in monti palavris qui num significa nadis i pareci latim. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis.",
     category: "lol"
+  }
+}
+
+# Also is possible create only the category
+{
+  action: 'create',
+  what: 'category',
+  data: {
+    name: "Marmotas"
   }
 }
 ```
@@ -51,10 +62,23 @@ The structure of the JSON is:
 * Show: means show the posts, by filter or all
 
 ```ruby
-# Default is all posts
+# To show users, if you are an admin
+{
+  action: 'show',
+  what: 'users'
+}
+
+# To show all categories
+{
+  action: 'show',
+  what: 'categories'
+}
+
+# To show posts, a filter can be used, default is all
 # Owner an category are opcional
 {
   action: 'show',
+  what: 'posts'
   data: {
     user: "",
     category: ""
@@ -82,7 +106,11 @@ The structure of the JSON is:
     String line commands
 
 * `{"action": "marmota"}`
-* `{"action": "show", "data": { "category": "Marmotagem"}}`
+* `{"action": "show", "what": "users" }`
+* `{"action": "show", "what": "categories" }`
+* `{"action": "show", "what": "posts","data": { "category": "marmotagem"}}`
+* `{"action": "create", "data": { "title": "Something", "body": "Mussum ipsum cacilds, vidis litro abertis.", "category": "lol" }}`
+* `{"action": "create", "what": "category", "data": { "name": "Marmotas" }}`
 
 ## Basic flow
 

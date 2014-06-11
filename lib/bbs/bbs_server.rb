@@ -47,15 +47,14 @@ module BBS
           @@connected_clients.push(@user)
           send_line("-> Welcome #{@user.username}. You have #{@user.how_many_posts?} publications")
         else
-          puts " #{@user.username} have two connections, kill one!"
-          send_line("-> You stay logged from another ip")
+          puts " #{@user.username}_two have two connections, kill one!"
           handle_close
         end
       end
     end
 
     def ask_username
-      self.send_line("--  Enter your username:")
+      send_line("--  Enter your username:")
     end
 
     #
@@ -63,8 +62,8 @@ module BBS
     #
     def handle_actions(hash)
       case hash['action']
-      when "create" then handle_create(hash["data"])
-      when "show" then handle_show(hash["data"])
+      when "create" then handle_create(hash)
+      when "show" then handle_show(hash)
       when "delete" then handle_delete(hash["data"])
       when "marmota" then handle_close
       when "status" then status
@@ -74,12 +73,13 @@ module BBS
 
     # Receive a String and convert to a hash
     def handle_raw_data(data)
+      # Try convert to a JSON
       begin
         data_hash = JSON.parse(data)
         handle_actions(data_hash)
       rescue Exception => error
         send_line "What? I cannot understand you, bro!"
-        puts "Error #{error.message}"
+        puts "Error #{error.inspect}"
       end
     end
 
@@ -111,27 +111,75 @@ module BBS
     end
 
     private
+    # Handle create
     def handle_create(data_hash)
+      case data_hash['what']
+      when 'post' then create_a_post(data_hash['data'])
+      when 'category' then create_a_category(data_hash['data'])
+      end
+    end
 
-      data_hash.store("user_id", @user.id)
-      @post = PostsController.create(data_hash)
+    def create_a_post(data_hash)
+      puts "pqp"
+      begin
+        @post = PostsController.new.create(data_hash, @user)
+      rescue Exception => e
+        puts e.inspect
+      end
 
       unless @post.nil?
         send_line "successfully created, see: #{@post.to_json}"
       else
         send_line "Post cannot be created"
       end
-
     end
 
-    def handle_show(data_hash)
-      begin
-        @post = PostsController.new.search(data_hash['user'], data_hash['category'])
+    def create_a_category(data_hash)
+      @category = CategoriesController.new.create(data_hash['name'])
 
-        if @post.empty?
+      unless @category.nil?
+        send_line "successfully created, see: #{@category.to_json}"
+      else
+        send_line "Category cannot be created"
+      end
+    end
+
+    # Handle show actions
+    def handle_show(data_hash)
+      case data_hash['what']
+      when 'users' then show_users
+      when 'posts' then show_posts_by_filter(data_hash['data'])
+      when 'categories' then show_categories
+      else self.send_line "What? I cannot understand you, bro!"
+      end
+    end
+
+    # Show users
+    def show_users
+      users = UsersController.new.all_users(@user)
+      send_line "#{users.to_json}"
+    end
+
+    # Show Categories
+    def show_categories
+      categories = CategoriesController.new.all_categories
+
+      if categories.empty?
+        "Nothing found"
+      else
+        send_line "#{categories.to_json}"
+      end
+    end
+
+    # Show posts, by filter if provided
+    def show_posts_by_filter(hash)
+      begin
+        @posts = PostsController.new.search(hash['user'], hash['category'])
+
+        if @posts.empty?
           send_line "Nothing found."
         else
-          send_line "#{@post.to_json}"
+          send_line "#{@posts.to_json}"
         end
       rescue Exception => e
         puts "An error has ocurred. See: #{e.message}"

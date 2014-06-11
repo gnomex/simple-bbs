@@ -1,15 +1,19 @@
 module BBS
   class CategoriesController
 
-    def create(name = nil)
+    def create(name)
       @category = Category.find_by(name: name)
 
       if @category.nil?
         @category = Category.new(name: name)
-        @category if @category.save
+        return @category if @category.save
       else
-        "Category already exists"
+        @category
       end
+    end
+
+    def all_categories
+      Category.all
     end
 
     def search(category)
