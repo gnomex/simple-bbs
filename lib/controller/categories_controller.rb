@@ -1,11 +1,11 @@
 module BBS
   class CategoriesController
 
-    def create(name)
-      @category = Category.find_by(name: name)
+    def create(category)
+      @category = Category.find_by(name: category)
 
       if @category.nil?
-        @category = Category.new(name: name)
+        @category = Category.new(name: category)
         return @category if @category.save
       else
         @category
@@ -25,10 +25,16 @@ module BBS
     end
 
     def delete(category)
-      @category = Category.find_by(category_id: category.id)
+      @category = Category.find_by(name: category)
+
       unless @category
-        @category.destroy
-        "Deleted!"
+        how_many = @category.posts.count
+        if how_many == 0
+          @category.destroy
+          "Deleted!"
+        else
+          "Category has #{how_many} posts associated, cannot remove"
+        end
       else
         "Nothing found"
       end

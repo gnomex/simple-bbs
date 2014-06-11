@@ -64,7 +64,7 @@ module BBS
       case hash['action']
       when "create" then handle_create(hash)
       when "show" then handle_show(hash)
-      when "delete" then handle_delete(hash["data"])
+      when "delete" then handle_delete(hash)
       when "marmota" then handle_close
       when "status" then status
       else self.send_line "What? I cannot understand you, bro!"
@@ -116,6 +116,7 @@ module BBS
       case data_hash['what']
       when 'post' then create_a_post(data_hash['data'])
       when 'category' then create_a_category(data_hash['data'])
+      else send_line "What?"
       end
     end
 
@@ -165,7 +166,7 @@ module BBS
       categories = CategoriesController.new.all_categories
 
       if categories.empty?
-        "Nothing found"
+        send_line "Nothing found."
       else
         send_line "#{categories.to_json}"
       end
@@ -187,7 +188,21 @@ module BBS
     end
 
     def handle_delete(data_hash)
-      PostsController.new.delete(data_hash['post_id'], @user)
+      case data_hash['what']
+      when 'post' then delete_a_post(data_hash['data'])
+      when 'category' then delete_a_category(data_hash['data'])
+      else send_line "What?"
+      end
+    end
+
+    def delete_a_post(hash)
+      message = PostsController.new.delete(hash['post_id'], @user)
+      send_line "#{message.to_json}"
+    end
+
+    def delete_a_category(hash)
+      message = CategoriesController.new.delete(hash['category'])
+      send_line "#{message.to_json}"
     end
 
     def handle_close

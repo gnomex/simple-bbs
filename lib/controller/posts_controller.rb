@@ -30,7 +30,7 @@ module BBS
           "You do not have permission to delete!"
         end
       else
-        "Nothing found for #{post.title}"
+        "Nothing found for #{post_id}"
       end
     end
 
