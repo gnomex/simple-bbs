@@ -45,7 +45,7 @@ module BBS
 
         unless other_peers
           @@connected_clients.push(@user)
-          send_line("-> Welcome #{@user.username}")
+          send_line("-> Welcome #{@user.username}. You have #{@user.how_many_posts?} publications")
         else
           puts " #{@user.username} have two connections, kill one!"
           send_line("-> You stay logged from another ip")
@@ -118,6 +118,8 @@ module BBS
 
       unless @post.nil?
         send_line "successfully created, see: #{@post.to_json}"
+      else
+        send_line "Post cannot be created"
       end
 
     end
@@ -126,7 +128,7 @@ module BBS
       begin
         @post = PostsController.new.search(data_hash['user'], data_hash['category'])
 
-        if @post.nil?
+        if @post.empty?
           send_line "Nothing found."
         else
           send_line "#{@post.to_json}"

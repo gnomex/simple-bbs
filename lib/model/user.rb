@@ -23,6 +23,10 @@ module BBS
       !self.name.empty?
     end
 
+    def how_many_posts?
+      self.posts.count
+    end
+
     private
     def check_admin
       self.admin

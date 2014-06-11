@@ -29,6 +29,8 @@ module BBS
       Signal.trap("INT")  { EventMachine.stop }
       Signal.trap("TERM") { EventMachine.stop }
 
+      puts "Starting a server..."
+
       EventMachine.start_server("localhost", 10000, BBSServer)
     end
   end
