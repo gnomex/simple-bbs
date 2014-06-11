@@ -46,6 +46,8 @@ module BBS
         unless other_peers
           @@connected_clients.push(@user)
           send_line("-> Welcome #{@user.username}. You have #{@user.how_many_posts?} publications")
+          send_line("See the available categories")
+          show_categories
         else
           puts " #{@user.username}_two have two connections, kill one!"
           handle_close
