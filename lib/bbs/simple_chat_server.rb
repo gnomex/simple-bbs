@@ -1,4 +1,5 @@
 module BBS
+  # Only a code example
   class SimpleChatServer < EM::Connection
 
     @@connected_clients = Array.new

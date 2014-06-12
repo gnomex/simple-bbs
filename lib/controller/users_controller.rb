@@ -1,9 +1,8 @@
 module BBS
+  # Manage the user model
   class UsersController
-    def have_name?
-      @user.username?
-    end
-
+    # Check if user exists
+    # => Create if not
     def check_user(username)
       @user = User.find_by(name: username)
 
@@ -16,6 +15,7 @@ module BBS
       end
     end
 
+    # All users
     def all_users(user)
       if user.admin?
         User.all
@@ -24,11 +24,11 @@ module BBS
       end
     end
 
+    # Make a user an admin :)
     def make_admin!
       @user = User.find(:id)
       @user.make_admin!
       @user.update
     end
-
   end
 end

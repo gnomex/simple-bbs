@@ -1,4 +1,5 @@
 module BBS
+  # Only a code example
   class EchoServer < EM::Connection
     def receive_data(data)
       puts data.to_s

@@ -23,6 +23,7 @@ ActiveRecord::Base.logger = Logger.new(STDERR)
 module BBS
   VERSION = "0.0.1"
 
+  # Run the event machine and start the server socket
   def BBS.start_bbs_server
     EventMachine.run do
       # hit Control + C to stop
@@ -31,27 +32,7 @@ module BBS
 
       puts "Starting a server..."
 
-      EventMachine.start_server("localhost", 10000, BBSServer)
-    end
-  end
-
-  def BBS.run_echo_server
-    EventMachine.run do
-      # hit Control + C to stop
-      Signal.trap("INT")  { EventMachine.stop }
-      Signal.trap("TERM") { EventMachine.stop }
-
-      EventMachine.start_server("localhost", 10000, EchoServer)
-    end
-  end
-
-  def BBS.simple_chat_server
-    EventMachine.run do
-      # hit Control + C to stop
-      Signal.trap("INT")  { EventMachine.stop }
-      Signal.trap("TERM") { EventMachine.stop }
-
-      EventMachine.start_server("localhost", 10000, SimpleChatServer)
+      EventMachine.start_server('0.0.0.0', 10000, BBSServer)
     end
   end
 end
